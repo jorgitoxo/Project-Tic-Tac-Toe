@@ -1,3 +1,7 @@
+const Game = (function () {
+    
+})();
+
 const Gameboard = (function () {
     const gameboard = [
         "", "", "",
