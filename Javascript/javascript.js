@@ -12,11 +12,6 @@
 
 const Game = (function () {
 
-    const displayController = (function () {
-        
-        return {};
-    })();
-
     return {}
 })();
 
@@ -25,17 +20,18 @@ const Gameboard = (function () {
     const columns = 3;
     const gameboard = [];
     
-    function Cell () {
-        let token = "";
+    function Cell (playerToken) {
+        let tokenInCell = "";
 
-        const getToken = () => token;
+        const getToken = () => tokenInCell;
 
-        const addToken = (token) => {
-            
+        const addToken = (playerToken) => {
+            tokenInCell = playerToken;
         }
 
         return {
             getToken,
+            addToken
         }
     }
 
@@ -51,7 +47,8 @@ const Gameboard = (function () {
     for (let row = 0; row < rows; row++) {
         gameboard[row] = [];
         for (let col = 0; col < columns; col++) {
-            gameboard[row].push("_");
+            // gameboard[row].push("_");
+            gameboard[row].push(Cell());
         };
     };
 
@@ -79,26 +76,38 @@ const Gameboard = (function () {
     // Method: Gameboard.getGameBoard()
     // vs
     // Property: Gameboard.getGameBoard
-    const printGameBoard = () => { console.log(gameboard) };
+    // const printGameBoard = () => { console.log(gameboard) };
+    const printGameBoard = console.log(gameboard.map((row) => row.map((cell) => cell.getToken())));
     
     return { getGameBoard, printGameBoard }
 })();
 
 // Needs work
-const Player = (function(name="Jorgito", token="X") {
-    const playerName = name;
-    const playerToken = token;
-    let score = 0;
+function Player (name="Slick", token="X") {
+    this.name = name;
+    this.token = token;
+    this.score = 0;
 
     // CBUT
-    const logPlayerName = () => console.log(playerName);
-    const logPlayerToken = () => console.log(playerToken);
+    const logPlayerName = () => console.log(this.name);
+    const logPlayerToken = () => console.log(this.token);
     
 
-    return { playerName, playerToken, score, logPlayerName, logPlayerToken };
-})();
+    return { name, token, score, logPlayerName, logPlayerToken };
+};
+
+// CBUT
+// const Edson = Player("Edson", "0");
+// Edson.logPlayerName();
+// Edson.logPlayerToken();
+// // 
+// const Rui = Player("Rui", "X");
+// Rui.logPlayerName();
+// Rui.logPlayerToken();
+// // 
+// Player.logPlayerName();
+// Player.logPlayerToken();
+
 
 // RUN
-Gameboard.printGameBoard();
-Player.logPlayerName();
-Player.logPlayerToken();
+Gameboard.printGameBoard;
