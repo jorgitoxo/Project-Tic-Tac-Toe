@@ -10,9 +10,12 @@
 // DCB: Debugging code below
 // CBUT: Code below used for testing
 
-const Game = (function () {
+const Game = (function (playerOne, playerTwo) {
     
-    return {}
+    return {
+        // playRound,
+        // getActivePlayer
+    }
 })();
 
 const Gameboard = (function () {
@@ -20,23 +23,19 @@ const Gameboard = (function () {
     const columns = 3;
     const gameboard = [];
     
-    function Cell (playerToken) {
+    function Cell () {
         let tokenInCell = "";
 
         const getToken = () => tokenInCell;
 
-        const addToken = (playerToken) => {
-            tokenInCell = playerToken;
+        const addToken = (player) => {
+            tokenInCell = player.getToken();
         }
 
         return {
             getToken,
             addToken
         }
-    }
-
-    function markToken(token) {
-
     }
 
     // Build the board!
@@ -59,11 +58,17 @@ const Gameboard = (function () {
     // in the console
     const printGameBoard = () => console.log(gameboard.map((row) => row.map((cell) => cell.getToken())));
     
-    return { getGameBoard, printGameBoard }
+    const markToken = function (xAxis, yAxis, player) {
+        if (gameboard[xAxis][yAxis].getToken() !== "") return;
+        
+        gameboard[xAxis][yAxis].addToken(player);
+    }
+
+    return { getGameBoard, printGameBoard, markToken }
 })();
 
 // Needs work
-function Player (name="Slick", token="X") {
+function Player (name="Player", token="X") {
     this.name = name;
     this.token = token;
     this.score = 0;
@@ -75,18 +80,18 @@ function Player (name="Slick", token="X") {
     return { getName, getToken, getScore };
 };
 
-// CBUT
-// const Edson = Player("Edson", "0");
-// Edson.logPlayerName();
-// Edson.logPlayerToken();
-// // 
-// const Rui = Player("Rui", "X");
-// Rui.logPlayerName();
-// Rui.logPlayerToken();
-// // 
-// Player.logPlayerName();
-// Player.logPlayerToken();
-
 
 // RUN
+let Eddy = new Player ('Eddy', 'X');
+
 Gameboard.printGameBoard();
+Gameboard.markToken(0, 0, Eddy);
+Gameboard.printGameBoard();
+
+// Jest testing
+try {
+    module.exports = Gameboard;
+    // module.exports = Gameboard.gameboard.addToken;
+} catch (error) {
+    console.log('we got a problem chief');
+}
