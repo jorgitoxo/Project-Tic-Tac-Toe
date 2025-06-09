@@ -1,5 +1,7 @@
 // Author: Jorge Leonard-Pinero
 
+const { log } = require("console");
+
 // Interactive game of tic-tac-toe
 // Aim:
 //  To practice using module pattern
@@ -56,37 +58,74 @@ const Gameboard = (function () {
 
     // Show the content of the gameboard object
     // in the console
-    const printGameBoard = () => console.log(gameboard.map((row) => row.map((cell) => cell.getToken())));
+    // const printGameBoard = () => console.log(gameboard.map((row) => row.map((cell) => cell.getToken())));
+    const printGameBoard = () => {
+        for (let i = 0; i < gameboard.length; i++) {
+            // console.log(gameboard[i]);
+            let row = [];
+            for (let j = 0; j < gameboard[i].length; j++) {
+                row.push(gameboard[i][j].getToken());
+            }
+            console.log(row);
+        }
+        console.log();
+    };
     
     const markToken = function (xAxis, yAxis, player) {
-        if (gameboard[xAxis][yAxis].getToken() !== "") return;
+        try {
+            if (gameboard[xAxis][yAxis].getToken() !== "") return;
+            gameboard[xAxis][yAxis].addToken(player);
+        } catch (error) {
+            console.log("Ilegal move!");
+            return;
+        }
         
-        gameboard[xAxis][yAxis].addToken(player);
+        // function isAvailable(cell) {
+        //     if (cell === "") {
+        //         return true;
+        //     } else {
+        //         return false;
+        //     }
+        // }
+        // const availableCells = gameboard
+        //                         .filter(row => isAvailable(row[yAxis]))
+        //                         .map(row => row[yAxis]);
+        
+        // getAvailableCells = () => availableCells;
+        // if (!availableCells.length) return;
+        
     }
 
     return { getGameBoard, printGameBoard, markToken }
 })();
 
-// Needs work
-function Player (name="Player", token="X") {
-    this.name = name;
-    this.token = token;
-    this.score = 0;
+function Player (playerName, playerToken) {
+    const name = playerName;
+    const token = playerToken;
+    const score = 0;
     
-    const getName = () => this.name;
-    const getToken = () => this.token;
-    const getScore = () => this.score;
+    const getName = () => name;
+    const getToken = () => token;
+    const getScore = () => score;
 
     return { getName, getToken, getScore };
 };
 
 
 // RUN
-let Eddy = new Player ('Eddy', 'X');
+let Eddy = Player('Eddy', 'O');
+let Nia = Player('Nia', 'X');
 
 Gameboard.printGameBoard();
-Gameboard.markToken(0, 0, Eddy);
+Gameboard.markToken(1, 1, Eddy);
 Gameboard.printGameBoard();
+Gameboard.markToken(0, 0, Nia);
+Gameboard.printGameBoard();
+Gameboard.markToken(0, 1, Eddy);
+Gameboard.printGameBoard();
+Gameboard.markToken(2, 1, Nia);
+Gameboard.printGameBoard();
+Gameboard.markToken(1, 0, Eddy);
 
 // Jest testing
 try {
