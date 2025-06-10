@@ -12,36 +12,6 @@ const { log } = require("console");
 // DCB: Debugging code below
 // CBUT: Code below used for testing
 
-const Game = (function (playerOne, playerTwo) {
-    const players = [
-        playerOne,
-        playerTwo
-    ];
-
-    let activePlayer = players[0];
-    
-    const getActivePlayer = () => activePlayer;
-
-    const switchPlayerTurn = () => {
-        activePlayer = activePlayer === players[0] ? players[1] : players[0];
-    }
-
-    const printRound = () => {
-        Gameboard.printGameBoard();
-        console.log(`${getActivePlayer().getName()}'s turn.`);
-    }
-
-    const playRound = () => {
-
-    }
-
-    return {
-        // playRound,
-        // getActivePlayer,
-        // printRound
-    }
-})();
-
 const Gameboard = (function () {
     const rows = 3;
     const columns = 3;
@@ -117,36 +87,104 @@ const Gameboard = (function () {
         
     }
 
-    return { getGameBoard, printGameBoard, markToken }
+    return {
+            getGameBoard,
+            printGameBoard,
+            markToken
+    }
 })();
 
 function Player (playerName, playerToken) {
     const name = playerName;
     const token = playerToken;
-    const score = 0;
+    // const score = 0;
     
     const getName = () => name;
     const getToken = () => token;
-    const getScore = () => score;
+    // const getScore = () => score;
 
-    return { getName, getToken, getScore };
+    return {
+            getName,
+            getToken,
+            // getScore 
+    };
 };
-
-
-// RUN
 const Eddy = Player('Eddy', 'O');
 const Nia = Player('Nia', 'X');
 
-Gameboard.printGameBoard();
-Gameboard.markToken(1, 1, Eddy);
-Gameboard.printGameBoard();
-Gameboard.markToken(0, 0, Nia);
-Gameboard.printGameBoard();
-Gameboard.markToken(0, 1, Eddy);
-Gameboard.printGameBoard();
-Gameboard.markToken(2, 1, Nia);
-Gameboard.printGameBoard();
-Gameboard.markToken(1, 0, Eddy);
+const Game = (function (playerOne=Eddy, playerTwo=Nia) {
+    const players = [
+        playerOne,
+        playerTwo
+    ];
+
+    let activePlayer = players[0];
+    
+    const getActivePlayer = () => activePlayer;
+
+    const switchPlayerTurn = () => {
+        activePlayer = activePlayer === players[0] ? players[1] : players[0];
+    }
+
+    const printRound = () => {
+        console.log(`${getActivePlayer().getName()}'s turn.`);
+        Gameboard.printGameBoard();
+    }
+
+    const playRound = (row, col) => {
+        console.log(`Marking ${getActivePlayer().getName()}'s ${getActivePlayer().getToken()} token`);
+        Gameboard.markToken(row, col, getActivePlayer());
+
+        // Code to check for winner and handle the logic below
+        const winnerRow = Gameboard.getGameBoard()[row].filter((cell) => (cell.getToken() === getActivePlayer().getToken()));
+        const winnerCol = Gameboard.getGameBoard().filter((row) => (row[col] === getActivePlayer().getToken()));
+
+        // const winnerDiag = Gameboard.getGameBoard().filter((row) => )
+
+        if ((winnerRow.length === 3) || (winnerCol.length === 3)) {
+            Gameboard.printGameBoard();
+            console.log(`${getActivePlayer().getName()}'s ${getActivePlayer().getToken()}s win!`);
+            return;
+        }
+
+
+        // Switch player turn
+        // switchPlayerTurn();
+        printRound();
+    }
+
+    // Initial play game message when Game is called
+    printRound();
+
+    return {
+        // getActivePlayer,
+        // switchPlayerTurn,
+        // printRound,
+        playRound
+    }
+})();
+
+// RUN
+// const Eddy = Player('Eddy', 'O');
+// const Nia = Player('Nia', 'X');
+
+// Gameboard.printGameBoard();
+// Gameboard.markToken(1, 1, Eddy);
+// Gameboard.printGameBoard();
+// Gameboard.markToken(0, 0, Nia);
+// Gameboard.printGameBoard();
+// Gameboard.markToken(0, 1, Eddy);
+// Gameboard.printGameBoard();
+// Gameboard.markToken(2, 1, Nia);
+// Gameboard.printGameBoard();
+// Gameboard.markToken(1, 0, Eddy);
+
+Game.playRound(0, 0);
+Game.playRound(0, 1);
+Game.playRound(0, 2);
+
+
+
 
 // Jest testing
 try {
