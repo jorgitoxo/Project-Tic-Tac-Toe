@@ -13,10 +13,23 @@ const { log } = require("console");
 // CBUT: Code below used for testing
 
 const Game = (function (playerOne, playerTwo) {
-    
+    const players = [
+        playerOne,
+        playerTwo
+    ];
+
+    let activePlayer = players[0];
+    const getActivePlayer = () => activePlayer;
+
+    const printRound = () => {
+        Gameboard.printGameBoard();
+        console.log(`${getActivePlayer().getName()}'s turn.`);
+    }
+
     return {
         // playRound,
-        // getActivePlayer
+        // getActivePlayer,
+        // printRound
     }
 })();
 
@@ -61,7 +74,6 @@ const Gameboard = (function () {
     // const printGameBoard = () => console.log(gameboard.map((row) => row.map((cell) => cell.getToken())));
     const printGameBoard = () => {
         for (let i = 0; i < gameboard.length; i++) {
-            // console.log(gameboard[i]);
             let row = [];
             for (let j = 0; j < gameboard[i].length; j++) {
                 row.push(gameboard[i][j].getToken());
@@ -70,7 +82,7 @@ const Gameboard = (function () {
         }
         console.log();
     };
-    
+
     const markToken = function (xAxis, yAxis, player) {
         try {
             if (gameboard[xAxis][yAxis].getToken() !== "") return;
@@ -113,8 +125,8 @@ function Player (playerName, playerToken) {
 
 
 // RUN
-let Eddy = Player('Eddy', 'O');
-let Nia = Player('Nia', 'X');
+const Eddy = Player('Eddy', 'O');
+const Nia = Player('Nia', 'X');
 
 Gameboard.printGameBoard();
 Gameboard.markToken(1, 1, Eddy);
