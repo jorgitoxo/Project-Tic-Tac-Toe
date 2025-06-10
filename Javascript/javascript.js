@@ -19,11 +19,20 @@ const Game = (function (playerOne, playerTwo) {
     ];
 
     let activePlayer = players[0];
+    
     const getActivePlayer = () => activePlayer;
+
+    const switchPlayerTurn = () => {
+        activePlayer = activePlayer === players[0] ? players[1] : players[0];
+    }
 
     const printRound = () => {
         Gameboard.printGameBoard();
         console.log(`${getActivePlayer().getName()}'s turn.`);
+    }
+
+    const playRound = () => {
+
     }
 
     return {
