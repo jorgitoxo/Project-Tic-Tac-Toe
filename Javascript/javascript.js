@@ -1,7 +1,4 @@
 // Author: Jorge Leonard-Pinero
-
-const { log } = require("console");
-
 // Interactive game of tic-tac-toe
 // Aim:
 //  To practice using module pattern
@@ -58,7 +55,7 @@ const Gameboard = (function () {
         }
 
         for (let i = 0; i < board.length; i++) {
-            secondary.push(board[i][--board.length - i].getToken());
+            secondary.push(board[i][board.length - 1 - i].getToken());
         }
 
         const getPrimary = () => principal;
@@ -130,9 +127,11 @@ function Player (playerName, playerToken) {
     return {
             getName,
             getToken,
-            // getScore 
+            // getScore
     };
 };
+
+// CBUT
 const Eddy = Player('Eddy', 'O');
 const Nia = Player('Nia', 'X');
 
@@ -157,27 +156,33 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
 
     const playRound = (row, col) => {
         console.log(`Marking ${getActivePlayer().getName()}'s ${getActivePlayer().getToken()} token`);
+        console.log();
+        
+        // TODO
+        // Add check for row and col
+        // (0 <= row|col <= 3)
         Gameboard.markToken(row, col, getActivePlayer());
 
-        // Code to check for winner and handle the logic below
-        // Rows and collumns
-        const winnerRow = Gameboard.getGameBoard()[row].filter((cell) => (cell.getToken() === getActivePlayer().getToken()));
+        // -- Code to check for winner and handle the logic below --
+        // Rows and columns
+        const winnerRow = Gameboard.getGameBoard()[row].filter((cell) => (cell.getToken() === getActivePlayer().getToken())).map(cell => [cell.getToken()]);
         const winnerCol = Gameboard.getGameBoard().filter((row) => (row[col].getToken() === getActivePlayer().getToken()));
 
         // Primary and Secondary diagonals
+        const primaryDiagonal = Gameboard.Diagonals().getPrimary().filter(token => token === getActivePlayer().getToken());
+        const secondaryDiagonal = Gameboard.Diagonals().getSecondary().filter(token => token === getActivePlayer().getToken());
 
-
-        // const winnerDiag = Gameboard.getGameBoard().filter((row) => )
-
-        if ((winnerRow.length === 3) || (winnerCol.length === 3)) {
+        // Check rows, columns and diagonals for a winner
+        if ((winnerRow.length === 3) || (winnerCol.length === 3) || (primaryDiagonal.length === 3) || (secondaryDiagonal.length === 3)) {
             Gameboard.printGameBoard();
             console.log(`${getActivePlayer().getName()}'s ${getActivePlayer().getToken()}s win!`);
             return;
         }
 
-
         // Switch player turn
-        // switchPlayerTurn();
+        switchPlayerTurn();
+
+        // Print round on console
         printRound();
     }
 
@@ -186,32 +191,20 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
 
     return {
         // getActivePlayer,
-        // switchPlayerTurn,
-        // printRound,
         playRound
     }
 })();
 
 // RUN
-// const Eddy = Player('Eddy', 'O');
-// const Nia = Player('Nia', 'X');
-
-// Gameboard.printGameBoard();
-// Gameboard.markToken(1, 1, Eddy);
-// Gameboard.printGameBoard();
-// Gameboard.markToken(0, 0, Nia);
-// Gameboard.printGameBoard();
-// Gameboard.markToken(0, 1, Eddy);
-// Gameboard.printGameBoard();
-// Gameboard.markToken(2, 1, Nia);
-// Gameboard.printGameBoard();
-// Gameboard.markToken(1, 0, Eddy);
-
-Game.playRound(0, 0);
+Game.playRound(0, 2);
+Game.playRound(1, 0);
 Game.playRound(1, 1);
+Game.playRound(2, 0);
+Game.playRound(0, 0);
 Game.playRound(2, 2);
-console.log(Gameboard.Diagonals().getPrimary());
-console.log(Gameboard.Diagonals().getSecondary());
+Game.playRound(2, 1);
+Game.playRound(1, 2);
+Game.playRound(0, 1);
 
 
 // Jest testing
