@@ -48,27 +48,28 @@ const Gameboard = (function () {
     // that the UI will eventually need to render it
     const getGameBoard = () => gameboard;
 
-    const getPrimaryDiagonal = () => {
-        let principal = [];
+    function Diagonals() {
         let board = Gameboard.getGameBoard();
+        let principal = [];
+        let secondary = [];
 
         for (let i = 0; i < board.length; i++) {
-            principal.push(board[i][i]);
+            principal.push(board[i][i].getToken());
         }
 
-        return principal;
-    }
-
-    const getSecondaryDiagonal = () => {
-        let secondary = [];
-        let board = Gameboard.getGameBoard();
-
-        for (let i = 0; i < Gameboard.getGameBoard().length; i++) {
-            secondary.push(Gameboard.getGameBoard()[i][--board.length - i])
+        for (let i = 0; i < board.length; i++) {
+            secondary.push(board[i][--board.length - i].getToken());
         }
 
-        return secondary;
+        const getPrimary = () => principal;
+        const getSecondary = () => secondary;
+
+        return {
+            getPrimary,
+            getSecondary
+        }
     }
+
 
     // Show the content of the gameboard object
     // in the console
@@ -112,7 +113,8 @@ const Gameboard = (function () {
     return {
             getGameBoard,
             printGameBoard,
-            markToken
+            markToken,
+            Diagonals
     }
 })();
 
@@ -206,8 +208,10 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
 // Gameboard.markToken(1, 0, Eddy);
 
 Game.playRound(0, 0);
-Game.playRound(1, 0);
-Game.playRound(2, 0);
+Game.playRound(1, 1);
+Game.playRound(2, 2);
+console.log(Gameboard.Diagonals().getPrimary());
+console.log(Gameboard.Diagonals().getSecondary());
 
 
 // Jest testing
