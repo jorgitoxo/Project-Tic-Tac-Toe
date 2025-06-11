@@ -48,6 +48,28 @@ const Gameboard = (function () {
     // that the UI will eventually need to render it
     const getGameBoard = () => gameboard;
 
+    const getPrimaryDiagonal = () => {
+        let principal = [];
+        let board = Gameboard.getGameBoard();
+
+        for (let i = 0; i < board.length; i++) {
+            principal.push(board[i][i]);
+        }
+
+        return principal;
+    }
+
+    const getSecondaryDiagonal = () => {
+        let secondary = [];
+        let board = Gameboard.getGameBoard();
+
+        for (let i = 0; i < Gameboard.getGameBoard().length; i++) {
+            secondary.push(Gameboard.getGameBoard()[i][--board.length - i])
+        }
+
+        return secondary;
+    }
+
     // Show the content of the gameboard object
     // in the console
     // const printGameBoard = () => console.log(gameboard.map((row) => row.map((cell) => cell.getToken())));
@@ -136,8 +158,11 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
         Gameboard.markToken(row, col, getActivePlayer());
 
         // Code to check for winner and handle the logic below
+        // Rows and collumns
         const winnerRow = Gameboard.getGameBoard()[row].filter((cell) => (cell.getToken() === getActivePlayer().getToken()));
         const winnerCol = Gameboard.getGameBoard().filter((row) => (row[col].getToken() === getActivePlayer().getToken()));
+
+        // Primary and Secondary diagonals
 
 
         // const winnerDiag = Gameboard.getGameBoard().filter((row) => )
@@ -183,8 +208,6 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
 Game.playRound(0, 0);
 Game.playRound(1, 0);
 Game.playRound(2, 0);
-
-
 
 
 // Jest testing
