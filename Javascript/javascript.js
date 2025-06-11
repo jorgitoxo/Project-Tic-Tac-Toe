@@ -137,7 +137,8 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
 
         // Code to check for winner and handle the logic below
         const winnerRow = Gameboard.getGameBoard()[row].filter((cell) => (cell.getToken() === getActivePlayer().getToken()));
-        const winnerCol = Gameboard.getGameBoard().filter((row) => (row[col] === getActivePlayer().getToken()));
+        const winnerCol = Gameboard.getGameBoard().filter((row) => (row[col].getToken() === getActivePlayer().getToken()));
+
 
         // const winnerDiag = Gameboard.getGameBoard().filter((row) => )
 
@@ -180,8 +181,8 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
 // Gameboard.markToken(1, 0, Eddy);
 
 Game.playRound(0, 0);
-Game.playRound(0, 1);
-Game.playRound(0, 2);
+Game.playRound(1, 0);
+Game.playRound(2, 0);
 
 
 
