@@ -23,9 +23,14 @@ const Gameboard = (function () {
             tokenInCell = player.getToken();
         }
 
+        const isEmpty = () => {
+            return !tokenInCell;
+        }
+
         return {
             getToken,
-            addToken
+            addToken,
+            isEmpty
         }
     }
 
@@ -50,10 +55,12 @@ const Gameboard = (function () {
         let principal = [];
         let secondary = [];
 
+        // Gather elements along main diagonal
         for (let i = 0; i < board.length; i++) {
             principal.push(board[i][i].getToken());
         }
 
+        // Gather elements along secondary diagonal
         for (let i = 0; i < board.length; i++) {
             secondary.push(board[i][board.length - 1 - i].getToken());
         }
@@ -66,7 +73,6 @@ const Gameboard = (function () {
             getSecondary
         }
     }
-
 
     // Show the content of the gameboard object
     // in the console
@@ -83,35 +89,15 @@ const Gameboard = (function () {
     };
 
     const markToken = function (xAxis, yAxis, player) {
-        try {
-            if (gameboard[xAxis][yAxis].getToken() !== "") return;
-            gameboard[xAxis][yAxis].addToken(player);
-        } catch (error) {
-            console.log("Ilegal move!");
-            return;
-        }
-        
-        // function isAvailable(cell) {
-        //     if (cell === "") {
-        //         return true;
-        //     } else {
-        //         return false;
-        //     }
-        // }
-        // const availableCells = gameboard
-        //                         .filter(row => isAvailable(row[yAxis]))
-        //                         .map(row => row[yAxis]);
-        
-        // getAvailableCells = () => availableCells;
-        // if (!availableCells.length) return;
-        
+        if (gameboard[xAxis][yAxis].getToken() !== "") return;
+        gameboard[xAxis][yAxis].addToken(player);
     }
 
     return {
             getGameBoard,
             printGameBoard,
-            markToken,
-            Diagonals
+            Diagonals,
+            markToken
     }
 })();
 
@@ -142,48 +128,86 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
     ];
 
     let activePlayer = players[0];
-    
     const getActivePlayer = () => activePlayer;
+
+    let gameWinner = "";
+    const setGameWinner = (player) => {
+        gameWinner = player;
+    }
+    const getGameWinner = () => gameWinner;
+
 
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
     }
 
     const printRound = () => {
-        console.log(`${getActivePlayer().getName()}'s turn.`);
         Gameboard.printGameBoard();
+        console.log(`${getActivePlayer().getName()}'s turn.`);
     }
 
     const playRound = (row, col) => {
-        console.log(`Marking ${getActivePlayer().getName()}'s ${getActivePlayer().getToken()} token`);
-        console.log();
+        if (!!Game.getGameWinner()) {
+            console.log(`Game over! ${Game.getGameWinner().getName()}'s ${Game.getGameWinner().getToken()}s won.`);
+            return;
+        }
+        // Check for valid values for row and col -- (0 <= row|col <= 3)
+        // IF method
+        if ((row > 2 || col > 2) || (!Gameboard.getGameBoard()[row][col].isEmpty())){
+            console.log("Ilegal move! Stay within gameboard bounds or cell already in use.");
+            console.log(`${getActivePlayer().getName()}, try again.`);
+            console.log();
+            return;
+        }
+
+        console.log(`Marking ${getActivePlayer().getName()}'s ${getActivePlayer().getToken()} token...`);
         
-        // TODO
-        // Add check for row and col
-        // (0 <= row|col <= 3)
+        let availableCellsCount = [].concat(...Gameboard.getGameBoard()).filter((cell) => cell.getToken() === "").length;
+        
+        const results = ["Player move", "Player win", "Tie"];
+        let roundResults = results[0];
+        
+        const getRoundResults = () => roundResults;
+
         Gameboard.markToken(row, col, getActivePlayer());
+        availableCellsCount -= 1;
 
         // -- Code to check for winner and handle the logic below --
         // Rows and columns
-        const winnerRow = Gameboard.getGameBoard()[row].filter((cell) => (cell.getToken() === getActivePlayer().getToken())).map(cell => [cell.getToken()]);
-        const winnerCol = Gameboard.getGameBoard().filter((row) => (row[col].getToken() === getActivePlayer().getToken()));
+        const activeRow = Gameboard.getGameBoard()[row].filter((cell) => (cell.getToken() === getActivePlayer().getToken())).map(cell => [cell.getToken()]);
+        const activeCol = Gameboard.getGameBoard().filter((row) => (row[col].getToken() === getActivePlayer().getToken()));
 
         // Primary and Secondary diagonals
         const primaryDiagonal = Gameboard.Diagonals().getPrimary().filter(token => token === getActivePlayer().getToken());
         const secondaryDiagonal = Gameboard.Diagonals().getSecondary().filter(token => token === getActivePlayer().getToken());
 
         // Check rows, columns and diagonals for a winner
-        if ((winnerRow.length === 3) || (winnerCol.length === 3) || (primaryDiagonal.length === 3) || (secondaryDiagonal.length === 3)) {
+        if ((activeRow.length === 3) || (activeCol.length === 3) || (primaryDiagonal.length === 3) || (secondaryDiagonal.length === 3)) {
+            // console testing
             Gameboard.printGameBoard();
             console.log(`${getActivePlayer().getName()}'s ${getActivePlayer().getToken()}s win!`);
+            //
+            Game.setGameWinner(getActivePlayer());
+            roundResults = results[1];
+            return;
+        } else if (!availableCellsCount) {
+            // console testing
+            Gameboard.printGameBoard();
+            console.log("Game is a tie!");
+            //
+            roundResults = results[2]
             return;
         }
+        // -- --
 
         // Switch player turn
         switchPlayerTurn();
-
         // Print round on console
         printRound();
+
+        return {
+            getRoundResults
+        }
     }
 
     // Initial play game message when Game is called
@@ -191,12 +215,14 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
 
     return {
         // getActivePlayer,
-        playRound
+        playRound,
+        setGameWinner,
+        getGameWinner
     }
 })();
 
 // RUN
-Game.playRound(0, 2);
+Game.playRound(10, 12);
 Game.playRound(1, 0);
 Game.playRound(1, 1);
 Game.playRound(2, 0);
@@ -205,6 +231,9 @@ Game.playRound(2, 2);
 Game.playRound(2, 1);
 Game.playRound(1, 2);
 Game.playRound(0, 1);
+Game.playRound(0, 2);
+Game.playRound(0, 2);
+Game.playRound(0, 2);
 
 
 // Jest testing
