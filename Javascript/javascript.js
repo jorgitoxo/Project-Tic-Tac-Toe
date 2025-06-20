@@ -161,13 +161,14 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
         }
 
         console.log(`Marking ${getActivePlayer().getName()}'s ${getActivePlayer().getToken()} token...`);
-        
-        let availableCellsCount = [].concat(...Gameboard.getGameBoard()).filter((cell) => cell.getToken() === "").length;
-        
+
         const results = ["Player move", "Player win", "Tie"];
         let roundResults = results[0];
-        
+
         const getRoundResults = () => roundResults;
+
+        let availableCellsCount = [].concat(...Gameboard.getGameBoard()).filter((cell) => cell.getToken() === "").length;
+        const getAvailableCellsCount = () => availableCellsCount;
 
         Gameboard.markToken(row, col, getActivePlayer());
         availableCellsCount -= 1;
@@ -206,7 +207,8 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
         printRound();
 
         return {
-            getRoundResults
+            getRoundResults,
+            getAvailableCellsCount
         }
     }
 
