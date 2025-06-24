@@ -1,0 +1,14 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#gameboard {
+    display: grid;
+    grid-template-columns: repeat(3, 32px);
+    /* height: 32px; */
+
+    > .cell {
+        border: 1px solid seagreen;
+    }
+}
