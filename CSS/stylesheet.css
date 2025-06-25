@@ -1,14 +1,28 @@
 * {
     margin: 0;
     padding: 0;
+    caret-color: transparent;
+
+    --cell-pixels: 128px;
+}
+
+#table {
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #gameboard {
     display: grid;
-    grid-template-columns: repeat(3, 32px);
-    /* height: 32px; */
+    grid-template-columns: repeat(3, var(--cell-pixels));
+    grid-template-rows: repeat(3, var(--cell-pixels));
+    gap: 2px;
+    background-color: seagreen;
+}
 
-    > .cell {
-        border: 1px solid seagreen;
-    }
+.cell {
+    background-color: whitesmoke;
+    text-align: center;
+    line-height: var(--cell-pixels);
 }
