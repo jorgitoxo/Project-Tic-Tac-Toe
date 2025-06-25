@@ -17,7 +17,7 @@
     display: grid;
     grid-template-columns: repeat(3, var(--cell-pixels));
     grid-template-rows: repeat(3, var(--cell-pixels));
-    gap: 2px;
+    gap: 6px;
     background-color: rgb(47, 79, 69);
 }
 
