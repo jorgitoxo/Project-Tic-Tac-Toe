@@ -217,7 +217,7 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
     printRound();
 
     return {
-        // getActivePlayer,
+        getActivePlayer,
         playRound,
         setGameWinner,
         getGameWinner
@@ -238,27 +238,41 @@ const displayController = (function() {
         });
     }
 
+    const markCells = function () {
+        const board = document.querySelector("#gameboard");
+        board.addEventListener('click', (e) => {
+            const cellPos = [...board.children].indexOf(e.target);
+            const row = Math.floor(cellPos/3);
+            const col = cellPos%3;
+            Game.playRound(row, col);
+        });
+    }
+
+    // Call to display the gameboard on screen for the first time
     showBoard();
 
-    return{
+    markCells();
+
+    return {
         showBoard
     }
 })();
 
 // RUN
-Game.playRound(10, 12);
-Game.playRound(1, 0);
-Game.playRound(1, 1);
-Game.playRound(2, 0);
-Game.playRound(0, 0);
-Game.playRound(2, 2);
-Game.playRound(2, 1);
-Game.playRound(1, 2);
-Game.playRound(0, 1);
+// Game.playRound(10, 12);
+// Game.playRound(1, 0);
+// Game.playRound(1, 1);
+// Game.playRound(2, 0);
+// Game.playRound(0, 0);
+// Game.playRound(2, 2);
+// Game.playRound(2, 1);
+// Game.playRound(1, 2);
+// Game.playRound(0, 1);
 // GAME END
-Game.playRound(0, 2);
-Game.playRound(0, 2);
-Game.playRound(0, 2);
+// Game.playRound(0, 2);
+// Game.playRound(0, 2);
+// Game.playRound(0, 2);
+//
 Gameboard.printGameBoard();
 
 // Jest testing
