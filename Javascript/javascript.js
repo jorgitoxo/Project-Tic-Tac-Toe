@@ -172,6 +172,7 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
 
         Gameboard.markToken(row, col, getActivePlayer());
         availableCellsCount -= 1;
+        displayController.showBoard();
 
         // -- Code to check for winner and handle the logic below --
         // Rows and columns
@@ -226,14 +227,14 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
 const displayController = (function() {
     const showBoard = function () {
         const cells = [].concat(...Gameboard.getGameBoard());
-        const visibleBoard = document.querySelector("#gameboard");
-        visibleBoard.replaceChildren();
+        const board = document.querySelector("#gameboard");
+        board.replaceChildren();
         
         cells.forEach((cell) => {
             const cellElement = document.createElement("div");
             cellElement.classList.add('cell');
             cellElement.textContent = cell.getToken();
-            visibleBoard.appendChild(cellElement);
+            board.appendChild(cellElement);
         });
     }
 
@@ -246,29 +247,18 @@ const displayController = (function() {
 
 // RUN
 Game.playRound(10, 12);
-displayController.showBoard();
 Game.playRound(1, 0);
-displayController.showBoard();
 Game.playRound(1, 1);
-displayController.showBoard();
 Game.playRound(2, 0);
-displayController.showBoard();
 Game.playRound(0, 0);
-displayController.showBoard();
 Game.playRound(2, 2);
-displayController.showBoard();
 Game.playRound(2, 1);
-displayController.showBoard();
 Game.playRound(1, 2);
-displayController.showBoard();
 Game.playRound(0, 1);
-displayController.showBoard();
+// GAME END
 Game.playRound(0, 2);
-displayController.showBoard();
 Game.playRound(0, 2);
-displayController.showBoard();
 Game.playRound(0, 2);
-displayController.showBoard();
 Gameboard.printGameBoard();
 
 // Jest testing
