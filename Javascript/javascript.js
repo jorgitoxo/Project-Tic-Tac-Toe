@@ -204,6 +204,7 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
 
         // Switch player turn
         switchPlayerTurn();
+
         // Print round on console
         printRound();
 
@@ -242,8 +243,9 @@ const displayController = (function() {
         const board = document.querySelector("#gameboard");
         board.addEventListener('click', (e) => {
             const cellPos = [...board.children].indexOf(e.target);
-            const row = Math.floor(cellPos/3);
-            const col = cellPos%3;
+            const boardRows = Gameboard.getGameBoard().length;
+            const row = Math.floor(cellPos / boardRows);
+            const col = cellPos % boardRows;
             Game.playRound(row, col);
         });
     }
@@ -251,6 +253,7 @@ const displayController = (function() {
     // Call to display the gameboard on screen for the first time
     showBoard();
 
+    // Call to initialize event handler on gameboard
     markCells();
 
     return {
@@ -258,26 +261,10 @@ const displayController = (function() {
     }
 })();
 
-// RUN
-// Game.playRound(10, 12);
-// Game.playRound(1, 0);
-// Game.playRound(1, 1);
-// Game.playRound(2, 0);
-// Game.playRound(0, 0);
-// Game.playRound(2, 2);
-// Game.playRound(2, 1);
-// Game.playRound(1, 2);
-// Game.playRound(0, 1);
-// GAME END
-// Game.playRound(0, 2);
-// Game.playRound(0, 2);
-// Game.playRound(0, 2);
-//
-Gameboard.printGameBoard();
 
 // Jest testing
 try {
-    module.exports = Gameboard;
+    // module.exports = Gameboard;
     // module.exports = Gameboard.gameboard.addToken;
 } catch (error) {
     console.log('we got a problem chief');
