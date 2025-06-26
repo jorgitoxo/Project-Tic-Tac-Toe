@@ -6,6 +6,11 @@
     --cell-pixels: 128px;
 }
 
+button {
+    width: 32px;
+    height: 32px;
+}
+
 #table {
     height: 100dvh;
     display: flex;
@@ -25,4 +30,7 @@
     background-color: whitesmoke;
     text-align: center;
     line-height: var(--cell-pixels);
+    cursor: pointer;
+    font-size: 3.2rem;
+    font-weight: 600;
 }
