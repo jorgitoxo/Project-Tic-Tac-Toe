@@ -14,6 +14,10 @@ const Gameboard = (function () {
     const columns = 3;
     const gameboard = [];
     
+    // Method of getting entire game board,
+    // that the UI will eventually need to render it
+    const getGameBoard = () => gameboard;
+    
     function Cell () {
         let tokenInCell = "";
 
@@ -34,21 +38,18 @@ const Gameboard = (function () {
         }
     }
 
-    // Build the board!
-    // The 2D array that will represent
-    // the state of the game board
-    // Row 0 represents the top row
-    // Column 0 represents the left-most column
-    for (let row = 0; row < rows; row++) {
-        gameboard[row] = [];
-        for (let col = 0; col < columns; col++) {
-            gameboard[row].push(Cell());
+    const buildGameBoard = function() {
+        // The 2D array that will represent
+        // the state of the game board
+        // Row 0 represents the top row
+        // Column 0 represents the left-most column
+        for (let row = 0; row < rows; row++) {
+            gameboard[row] = [];
+            for (let col = 0; col < columns; col++) {
+                gameboard[row].push(Cell());
+            };
         };
-    };
-
-    // Method of getting entire game board,
-    // that the UI will eventually need to render it
-    const getGameBoard = () => gameboard;
+    }
 
     function Diagonals() {
         let board = Gameboard.getGameBoard();
@@ -75,8 +76,8 @@ const Gameboard = (function () {
     }
 
     // Show the content of the gameboard object in the console
-    // const printGameBoard = () => console.log(gameboard.map((row) => row.map((cell) => cell.getToken())));
-    const printGameBoard = () => {
+    // const logGameBoard = () => console.log(gameboard.map((row) => row.map((cell) => cell.getToken())));
+    const logGameBoard = () => {
         for (let i = 0; i < gameboard.length; i++) {
             let row = [];
             for (let j = 0; j < gameboard[i].length; j++) {
@@ -92,11 +93,15 @@ const Gameboard = (function () {
         gameboard[xAxis][yAxis].addToken(player);
     }
 
+    // Build the board for the first time!
+    buildGameBoard();
+
     return {
+        buildGameBoard,
         getGameBoard,
-        printGameBoard,
+        logGameBoard,
         Diagonals,
-        markToken
+        markToken,
     }
 })();
 
@@ -129,24 +134,24 @@ const Game = (function () {
         PlayerOne,
         PlayerTwo
     ];
-    const getPlayers = () => players;
-
+    
     let activePlayer = players[0];
-    const getActivePlayer = () => activePlayer;
-
     let gameWinner = "";
+    
+    const getPlayers = () => players;
+    const getActivePlayer = () => activePlayer;
+    const getGameWinner = () => gameWinner;
+    
     const setGameWinner = (player) => {
         gameWinner = player;
     }
-    const getGameWinner = () => gameWinner;
-
-
+    
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
     }
 
     const printRound = () => {
-        Gameboard.printGameBoard();
+        Gameboard.logGameBoard();
         console.log(`${getActivePlayer().getName()}'s turn.`);
     }
 
@@ -155,8 +160,7 @@ const Game = (function () {
             console.log(`Game over! ${Game.getGameWinner().getName()}'s ${Game.getGameWinner().getToken()}s won.`);
             return;
         }
-        // Check for valid values for row and col -- (0 <= row|col <= 3)
-        // IF method
+        // Check for valid values for row and col (0 <= row|col <= 3) -- IF method
         if ((row > 2 || col > 2) || (!Gameboard.getGameBoard()[row][col].isEmpty())){
             console.log("Ilegal move! Stay within gameboard bounds or cell already in use.");
             console.log(`${getActivePlayer().getName()}, try again.`);
@@ -190,15 +194,15 @@ const Game = (function () {
         // Check for a winner along the rows, columns and diagonals
         if ((activeRow.length === 3) || (activeCol.length === 3) || (primaryDiagonal.length === 3) || (secondaryDiagonal.length === 3)) {
             // console testing
-            Gameboard.printGameBoard();
+            Gameboard.logGameBoard();
             console.log(`${getActivePlayer().getName()}'s ${getActivePlayer().getToken()}s win!`);
             //
-            Game.setGameWinner(getActivePlayer());
+            setGameWinner(getActivePlayer());
             roundResults = results[1];
             return;
         } else if (!availableCellsCount) {
             // console testing
-            Gameboard.printGameBoard();
+            Gameboard.logGameBoard();
             console.log("Game is a tie!");
             //
             roundResults = results[2]
@@ -221,9 +225,8 @@ const Game = (function () {
     printRound();
 
     return {
-        getActivePlayer,
         playRound,
-        setGameWinner,
+        getActivePlayer,
         getGameWinner,
         getPlayers
     }
@@ -302,6 +305,15 @@ const displayController = (function() {
             return;
         });
     };
+
+    const resetGame = (function() {
+        const newGameBtn = document.querySelector('#newGameBtn');
+
+        newGameBtn.addEventListener('click', () => {
+            Gameboard.buildGameBoard();
+            showBoard();
+        })
+    })();
 
     // Call to display the gameboard on screen for the first time
     showBoard();
