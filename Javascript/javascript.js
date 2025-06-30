@@ -74,8 +74,7 @@ const Gameboard = (function () {
         }
     }
 
-    // Show the content of the gameboard object
-    // in the console
+    // Show the content of the gameboard object in the console
     // const printGameBoard = () => console.log(gameboard.map((row) => row.map((cell) => cell.getToken())));
     const printGameBoard = () => {
         for (let i = 0; i < gameboard.length; i++) {
@@ -94,15 +93,15 @@ const Gameboard = (function () {
     }
 
     return {
-            getGameBoard,
-            printGameBoard,
-            Diagonals,
-            markToken
+        getGameBoard,
+        printGameBoard,
+        Diagonals,
+        markToken
     }
 })();
 
 function Player (playerName, playerToken) {
-    const name = playerName;
+    let name = playerName;
     const token = playerToken;
     // const score = 0;
     
@@ -110,22 +109,27 @@ function Player (playerName, playerToken) {
     const getToken = () => token;
     // const getScore = () => score;
 
+    const setName = (playerName) => {
+        name = playerName;
+    }
+
     return {
             getName,
             getToken,
+            setName
             // getScore
     };
 };
 
-// CBUT
-const Eddy = Player('Eddy', 'O');
-const Nia = Player('Nia', 'X');
+const Game = (function () {
+    let PlayerOne = Player('Eddy', 'O');
+    let PlayerTwo = Player('Nia', 'X');
 
-const Game = (function (playerOne=Eddy, playerTwo=Nia) {
     const players = [
-        playerOne,
-        playerTwo
+        PlayerOne,
+        PlayerTwo
     ];
+    const getPlayers = () => players;
 
     let activePlayer = players[0];
     const getActivePlayer = () => activePlayer;
@@ -164,17 +168,17 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
 
         const results = ["Player move", "Player win", "Tie"];
         let roundResults = results[0];
-
         const getRoundResults = () => roundResults;
 
         let availableCellsCount = [].concat(...Gameboard.getGameBoard()).filter((cell) => cell.getToken() === "").length;
         const getAvailableCellsCount = () => availableCellsCount;
 
+        // Mark token in gameboard array and show the updated board on screen
         Gameboard.markToken(row, col, getActivePlayer());
         availableCellsCount -= 1;
         displayController.showBoard();
 
-        // -- Code to check for winner and handle the logic below --
+        // -- Start of code to check for winner and handle the logic -- //
         // Rows and columns
         const activeRow = Gameboard.getGameBoard()[row].filter((cell) => (cell.getToken() === getActivePlayer().getToken())).map(cell => [cell.getToken()]);
         const activeCol = Gameboard.getGameBoard().filter((row) => (row[col].getToken() === getActivePlayer().getToken()));
@@ -183,7 +187,7 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
         const primaryDiagonal = Gameboard.Diagonals().getPrimary().filter(token => token === getActivePlayer().getToken());
         const secondaryDiagonal = Gameboard.Diagonals().getSecondary().filter(token => token === getActivePlayer().getToken());
 
-        // Check rows, columns and diagonals for a winner
+        // Check for a winner along the rows, columns and diagonals
         if ((activeRow.length === 3) || (activeCol.length === 3) || (primaryDiagonal.length === 3) || (secondaryDiagonal.length === 3)) {
             // console testing
             Gameboard.printGameBoard();
@@ -200,17 +204,16 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
             roundResults = results[2]
             return;
         }
-        // -- --
+        // -- End of code to check for winner and handle the logic -- //
 
         // Switch player turn
         switchPlayerTurn();
-
         // Print round on console
         printRound();
 
         return {
             getRoundResults,
-            getAvailableCellsCount
+            getAvailableCellsCount,
         }
     }
 
@@ -221,11 +224,17 @@ const Game = (function (playerOne=Eddy, playerTwo=Nia) {
         getActivePlayer,
         playRound,
         setGameWinner,
-        getGameWinner
+        getGameWinner,
+        getPlayers
     }
 })();
 
 const displayController = (function() {
+    const players = {
+        playerOne:Game.getPlayers()[0],
+        playerTwo:Game.getPlayers()[1]
+    }
+
     const showBoard = function () {
         const cells = [].concat(...Gameboard.getGameBoard());
         const board = document.querySelector("#gameboard");
@@ -239,7 +248,8 @@ const displayController = (function() {
         });
     }
 
-    const markCells = function () {
+    // Initializes click event handler on gameboard
+    const markCells = (function () {
         const board = document.querySelector("#gameboard");
         board.addEventListener('click', (e) => {
             const cellPos = [...board.children].indexOf(e.target);
@@ -248,13 +258,59 @@ const displayController = (function() {
             const col = cellPos % boardRows;
             Game.playRound(row, col);
         });
+    })();
+
+    // Show current player names on screen
+    const showPlayersNames = function () {
+        const playerOne = document.querySelector(`#${Object.getOwnPropertyNames(players)[0]}`);
+        const playerTwo = document.querySelector(`#${Object.getOwnPropertyNames(players)[1]}`);
+
+        playerOne.textContent = players.playerOne.getName();
+        playerTwo.textContent = players.playerTwo.getName();
     }
+
+    // Dialog window for players to enter their names
+    const playerNameModal = function (player) {
+        const playerNameBtn = document.getElementById(`${player}NameBtn`);
+        const dialogModal = document.querySelector(`#${player}NameBtn + dialog`);
+        const modalForm = document.querySelector(`#${player}NameForm`);
+        const modalCloseBtn = document.getElementById(`${player}CloseButton`);
+        const formPlayerName = document.querySelector(`#${player}Name`);
+        const formOKBtn = document.querySelector(`#${player}NameForm > button`);
+
+        const resetClose = function () {
+            modalForm.reset();
+            dialogModal.close();
+        }
+
+        playerNameBtn.addEventListener("click", () => {
+            dialogModal.showModal();
+            return;
+        });
+
+        // Handles close action on button event
+        modalCloseBtn.addEventListener("click", () => {
+            resetClose();
+            return;
+        });
+
+        // Handles name change action on OK button event
+        formOKBtn.addEventListener("click", () => {
+            players[`${player}`].setName(formPlayerName.value);
+            showPlayersNames();
+            resetClose();
+            return;
+        });
+    };
 
     // Call to display the gameboard on screen for the first time
     showBoard();
-
-    // Call to initialize event handler on gameboard
-    markCells();
+    // Call to display the players' names on screen for the first time
+    showPlayersNames();
+    
+    // Handles players' name change
+    const playerOneNameModal = playerNameModal("playerOne");
+    const playerTwoNameModal = playerNameModal("playerTwo");
 
     return {
         showBoard
