@@ -17,7 +17,7 @@ const Gameboard = (function () {
     // Method of getting entire game board,
     // that the UI will eventually need to render it
     const getGameBoard = () => gameboard;
-    
+
     function Cell () {
         let tokenInCell = "";
 
@@ -152,23 +152,28 @@ const Game = (function () {
 
     const printRound = () => {
         Gameboard.logGameBoard();
-        console.log(`${getActivePlayer().getName()}'s turn.`);
+        const roundMsg = `${getActivePlayer().getName()}'s turn.`
+        console.log(roundMsg);
     }
 
     const playRound = (row, col) => {
-        if (!!Game.getGameWinner()) {
-            console.log(`Game over! ${Game.getGameWinner().getName()}'s ${Game.getGameWinner().getToken()}s won.`);
-            return;
-        }
-        // Check for valid values for row and col (0 <= row|col <= 3) -- IF method
-        if ((row > 2 || col > 2) || (!Gameboard.getGameBoard()[row][col].isEmpty())){
-            console.log("Ilegal move! Stay within gameboard bounds or cell already in use.");
-            console.log(`${getActivePlayer().getName()}, try again.`);
-            console.log();
-            return;
-        }
+        const roundMsg = `Marking ${getActivePlayer().getName()}'s ${getActivePlayer().getToken()} token...`
+        console.log(roundMsg);
 
-        console.log(`Marking ${getActivePlayer().getName()}'s ${getActivePlayer().getToken()} token...`);
+        // Exit the round if there is an existing game winner
+        if (!!Game.getGameWinner()) {
+            const logMsg = `Game over! ${Game.getGameWinner().getName()}'s ${Game.getGameWinner().getToken()}s won.`;
+            displayController.updateFeed(logMsg);
+            console.log(logMsg);
+            return;
+        }
+        // Exit the round if values for row and col are above index 2 (0 <= row|col <= 3) -- IF method
+        if ((row > 2 || col > 2) || (!Gameboard.getGameBoard()[row][col].isEmpty())) {
+            const logMsg = `Ilegal move!\nStay within gameboard bounds or cell already in use.\n${getActivePlayer().getName()}, try again.\n`;
+            displayController.updateFeed(logMsg);
+            console.log(logMsg);
+            return;
+        }
 
         const results = ["Player move", "Player win", "Tie"];
         let roundResults = results[0];
@@ -194,18 +199,24 @@ const Game = (function () {
         // Check for a winner along the rows, columns and diagonals
         if ((activeRow.length === 3) || (activeCol.length === 3) || (primaryDiagonal.length === 3) || (secondaryDiagonal.length === 3)) {
             // console testing
+            const winMsg = `${getActivePlayer().getName()}'s ${getActivePlayer().getToken()}s win!`
             Gameboard.logGameBoard();
-            console.log(`${getActivePlayer().getName()}'s ${getActivePlayer().getToken()}s win!`);
+            console.log(winMsg);
             //
             setGameWinner(getActivePlayer());
             roundResults = results[1];
+            // Update game status on page
+            displayController.updateFeed(winMsg);
             return;
         } else if (!availableCellsCount) {
             // console testing
             Gameboard.logGameBoard();
-            console.log("Game is a tie!");
+            let tieMsg = "Game is a tie!"
+            console.log(tieMsg);
             //
             roundResults = results[2]
+            // Update game status on page
+            displayController.updateFeed(tieMsg);
             return;
         }
         // -- End of code to check for winner and handle the logic -- //
@@ -214,6 +225,9 @@ const Game = (function () {
         switchPlayerTurn();
         // Print round on console
         printRound();
+        // Update game status on page
+        let turnMsg = `${Game.getActivePlayer().getName()}'s turn.`
+        displayController.updateFeed(turnMsg);
 
         return {
             getRoundResults,
@@ -228,17 +242,22 @@ const Game = (function () {
         playRound,
         getActivePlayer,
         getGameWinner,
-        getPlayers
+        getPlayers,
+        setGameWinner
     }
 })();
 
 const displayController = (function() {
+    let turnMsg = function () {
+        return `${Game.getActivePlayer().getName()}'s turn.`
+    }
+
     const players = {
         playerOne:Game.getPlayers()[0],
         playerTwo:Game.getPlayers()[1]
     }
 
-    const showBoard = function () {
+    function showBoard () {
         const cells = [].concat(...Gameboard.getGameBoard());
         const board = document.querySelector("#gameboard");
         board.replaceChildren();
@@ -280,7 +299,7 @@ const displayController = (function() {
         const modalCloseBtn = document.getElementById(`${player}CloseButton`);
         const formPlayerName = document.querySelector(`#${player}Name`);
         const formOKBtn = document.querySelector(`#${player}NameForm > button`);
-
+        
         const resetClose = function () {
             modalForm.reset();
             dialogModal.close();
@@ -301,6 +320,7 @@ const displayController = (function() {
         formOKBtn.addEventListener("click", () => {
             players[`${player}`].setName(formPlayerName.value);
             showPlayersNames();
+            updateFeed(turnMsg());
             resetClose();
             return;
         });
@@ -310,22 +330,33 @@ const displayController = (function() {
         const newGameBtn = document.querySelector('#newGameBtn');
 
         newGameBtn.addEventListener('click', () => {
+            Game.setGameWinner("");
             Gameboard.buildGameBoard();
+            Gameboard.logGameBoard();
             showBoard();
+            updateFeed(turnMsg());
         })
     })();
 
+    function updateFeed (msg) {
+        const feed = document.querySelector('#gameFeed');
+        feed.textContent = msg;
+    }
+
+    // Handles players' name change
+    const playerOneNameModal = playerNameModal("playerOne");
+    const playerTwoNameModal = playerNameModal("playerTwo");
+    
     // Call to display the gameboard on screen for the first time
     showBoard();
     // Call to display the players' names on screen for the first time
     showPlayersNames();
-    
-    // Handles players' name change
-    const playerOneNameModal = playerNameModal("playerOne");
-    const playerTwoNameModal = playerNameModal("playerTwo");
+    // Call to display the player's turn on screen for the first time
+    updateFeed(turnMsg());
 
     return {
-        showBoard
+        showBoard,
+        updateFeed
     }
 })();
 
