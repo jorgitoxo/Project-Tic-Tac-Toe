@@ -7,23 +7,67 @@
 }
 
 button {
-    width: 32px;
-    height: 32px;
+    min-width: 24px;
+    max-height: 24px;
+}
+
+.player-card > svg {
+    width: 64px;
+    height: 64px;
 }
 
 #table {
     height: 100dvh;
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr;
+    grid-template-areas: 
+    "game-feed game-feed game-feed"
+    "player-one gameboard player-two"
+    ". new-game .";
+
     align-items: center;
+    justify-items: center;
 }
 
-#gameboard {
+.gameboard {
+    grid-area: gameboard;
+
     display: grid;
     grid-template-columns: repeat(3, var(--cell-pixels));
     grid-template-rows: repeat(3, var(--cell-pixels));
     gap: 6px;
     background-color: rgb(47, 79, 69);
+}
+
+.player-card {
+    max-height: 160px;
+    max-width: 200px;
+    padding: 5px;
+    text-align: center;
+}
+
+.player-card:nth-child(1) {
+    grid-area: player-one;
+}
+
+.player-card:nth-child(3) {
+    grid-area: player-two;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    column-gap: 8px;
+}
+
+.card-header p {
+    font-size: 2.4rem;
+}
+
+.game-feed {
+    grid-area: game-feed;
+
+    font-size: 3.6rem;
 }
 
 .cell {
@@ -33,4 +77,17 @@ button {
     cursor: pointer;
     font-size: 3.2rem;
     font-weight: 600;
+}
+
+#newGameBtn {
+    grid-area: new-game;
+
+    display: flex;
+    box-sizing: content-box;
+    min-width: 140px;
+    min-height: 80px;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 1.2rem;
 }
