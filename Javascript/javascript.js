@@ -134,14 +134,14 @@ const Game = (function () {
         PlayerOne,
         PlayerTwo
     ];
+    const getPlayers = () => players;
     
     let activePlayer = players[0];
-    let gameWinner = "";
-    
-    const getPlayers = () => players;
     const getActivePlayer = () => activePlayer;
-    const getGameWinner = () => gameWinner;
+    const resetActivePlayer = () => activePlayer = getPlayers()[0];
     
+    let gameWinner = "";
+    const getGameWinner = () => gameWinner;
     const setGameWinner = (player) => {
         gameWinner = player;
     }
@@ -156,10 +156,24 @@ const Game = (function () {
         console.log(roundMsg);
     }
 
+    const resetGame = function () {
+        setGameWinner("");
+        resetActivePlayer();
+    }
+
     const playRound = (row, col) => {
         const roundMsg = `Marking ${getActivePlayer().getName()}'s ${getActivePlayer().getToken()} token...`
         console.log(roundMsg);
 
+        const results = ["Player move", "Player win", "Tie"];
+        
+        let roundResults = results[0];
+        const getRoundResults = () => roundResults;
+
+        let availableCellsCount = [].concat(...Gameboard.getGameBoard()).filter((cell) => cell.getToken() === "").length;
+        const getAvailableCellsCount = () => availableCellsCount;
+
+        // First fail check -- game winner
         // Exit the round if there is an existing game winner
         if (!!Game.getGameWinner()) {
             const logMsg = `Game over! ${Game.getGameWinner().getName()}'s ${Game.getGameWinner().getToken()}s won.`;
@@ -167,6 +181,23 @@ const Game = (function () {
             console.log(logMsg);
             return;
         }
+
+        // Second exit check -- no cells available
+        // Exit the round if there are no available cells
+        if (!availableCellsCount) {
+            roundResults = results[2]
+
+            // console logging
+            const tieMsg = `Game over! Game is a tie!`;
+            console.log(tieMsg);
+            Gameboard.logGameBoard();
+
+            // Update game status on page
+            displayController.updateFeed(tieMsg);
+            return;
+        }
+
+        // Third fail check -- invalid coordinate points
         // Exit the round if values for row and col are above index 2 (0 <= row|col <= 3) -- IF method
         if ((row > 2 || col > 2) || (!Gameboard.getGameBoard()[row][col].isEmpty())) {
             const logMsg = `Ilegal move!\nStay within gameboard bounds or cell already in use.\n${getActivePlayer().getName()}, try again.\n`;
@@ -174,13 +205,6 @@ const Game = (function () {
             console.log(logMsg);
             return;
         }
-
-        const results = ["Player move", "Player win", "Tie"];
-        let roundResults = results[0];
-        const getRoundResults = () => roundResults;
-
-        let availableCellsCount = [].concat(...Gameboard.getGameBoard()).filter((cell) => cell.getToken() === "").length;
-        const getAvailableCellsCount = () => availableCellsCount;
 
         // Mark token in gameboard array and show the updated board on screen
         Gameboard.markToken(row, col, getActivePlayer());
@@ -198,25 +222,27 @@ const Game = (function () {
 
         // Check for a winner along the rows, columns and diagonals
         if ((activeRow.length === 3) || (activeCol.length === 3) || (primaryDiagonal.length === 3) || (secondaryDiagonal.length === 3)) {
-            // console testing
+            roundResults = results[1];
+            setGameWinner(getActivePlayer());
+
+            // Update game status on page
+            displayController.updateFeed(winMsg);
+
+            // console logging
             const winMsg = `${getActivePlayer().getName()}'s ${getActivePlayer().getToken()}s win!`
             Gameboard.logGameBoard();
             console.log(winMsg);
-            //
-            setGameWinner(getActivePlayer());
-            roundResults = results[1];
-            // Update game status on page
-            displayController.updateFeed(winMsg);
             return;
         } else if (!availableCellsCount) {
-            // console testing
-            Gameboard.logGameBoard();
-            let tieMsg = "Game is a tie!"
-            console.log(tieMsg);
-            //
             roundResults = results[2]
+            const tieMsg = "Game is a tie!"
+            
             // Update game status on page
             displayController.updateFeed(tieMsg);
+            
+            // console logging
+            console.log(tieMsg);
+            Gameboard.logGameBoard();
             return;
         }
         // -- End of code to check for winner and handle the logic -- //
@@ -243,7 +269,7 @@ const Game = (function () {
         getActivePlayer,
         getGameWinner,
         getPlayers,
-        setGameWinner
+        resetGame
     }
 })();
 
@@ -330,7 +356,7 @@ const displayController = (function() {
         const newGameBtn = document.querySelector('#newGameBtn');
 
         newGameBtn.addEventListener('click', () => {
-            Game.setGameWinner("");
+            Game.resetGame();
             Gameboard.buildGameBoard();
             Gameboard.logGameBoard();
             showBoard();
